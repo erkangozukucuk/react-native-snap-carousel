@@ -1,9 +1,10 @@
 // Parallax effect inspired by https://github.com/oblador/react-native-parallax/
 
-import React, { Component } from 'react';
-import { View, ViewPropTypes, Image, Animated, Easing, ActivityIndicator, findNodeHandle } from 'react-native';
+import React, {Component} from 'react';
+import {View, ViewPropTypes, Image, Animated, Easing, ActivityIndicator, findNodeHandle} from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './ParallaxImage.style';
+import {ViewStyle} from 'react-native';
 
 export default class ParallaxImage extends Component {
 
@@ -16,7 +17,7 @@ export default class ParallaxImage extends Component {
         sliderHeight: PropTypes.number, // passed from <Carousel />
         sliderWidth: PropTypes.number, // passed from <Carousel />
         vertical: PropTypes.bool, // passed from <Carousel />
-        containerStyle: ViewPropTypes ? ViewPropTypes.style : View.propTypes.style,
+        containerStyle: ViewPropTypes ? ViewPropTypes.style : ViewStyle,
         dimensions: PropTypes.shape({
             width: PropTypes.number,
             height: PropTypes.number
@@ -40,7 +41,7 @@ export default class ParallaxImage extends Component {
         AnimatedImageComponent: Animated.Image
     }
 
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = {
             offset: 0,
@@ -54,11 +55,11 @@ export default class ParallaxImage extends Component {
         this._measureLayout = this._measureLayout.bind(this);
     }
 
-    setNativeProps (nativeProps) {
+    setNativeProps(nativeProps) {
         this._container.setNativeProps(nativeProps);
     }
 
-    componentDidMount () {
+    componentDidMount() {
         this._mounted = true;
 
         setTimeout(() => {
@@ -66,11 +67,11 @@ export default class ParallaxImage extends Component {
         }, 0);
     }
 
-    componentWillUnmount () {
+    componentWillUnmount() {
         this._mounted = false;
     }
 
-    _measureLayout () {
+    _measureLayout() {
         if (this._container) {
             const {
                 dimensions,
@@ -105,15 +106,15 @@ export default class ParallaxImage extends Component {
         }
     }
 
-    _onLoad (event) {
-        const { animOpacity } = this.state;
-        const { fadeDuration, onLoad } = this.props;
+    _onLoad(event) {
+        const {animOpacity} = this.state;
+        const {fadeDuration, onLoad} = this.props;
 
         if (!this._mounted) {
             return;
         }
 
-        this.setState({ status: 2 });
+        this.setState({status: 2});
 
         if (onLoad) {
             onLoad(event);
@@ -126,23 +127,23 @@ export default class ParallaxImage extends Component {
             isInteraction: false,
             useNativeDriver: true
         }).start(() => {
-            this.setState({ status: 3 });
+            this.setState({status: 3});
         });
     }
 
     // If arg is missing from method signature, it just won't be called
-    _onError (event) {
-        const { onError } = this.props;
+    _onError(event) {
+        const {onError} = this.props;
 
-        this.setState({ status: 4 });
+        this.setState({status: 4});
 
         if (onError) {
             onError(event);
         }
     }
 
-    get image () {
-        const { status, animOpacity, offset, width, height } = this.state;
+    get image() {
+        const {status, animOpacity, offset, width, height} = this.state;
         const {
             scrollPosition,
             dimensions,
@@ -156,7 +157,7 @@ export default class ParallaxImage extends Component {
         } = this.props;
 
         const parallaxPadding = (vertical ? height : width) * parallaxFactor;
-        const requiredStyles = { position: 'relative' };
+        const requiredStyles = {position: 'relative'};
         const dynamicStyles = {
             width: vertical ? width : width + parallaxPadding * 2,
             height: vertical ? height + parallaxPadding * 2 : height,
@@ -181,41 +182,43 @@ export default class ParallaxImage extends Component {
 
         return (
             <AnimatedImageComponent
-              {...other}
-              style={[styles.image, style, requiredStyles, dynamicStyles]}
-              onLoad={this._onLoad}
-              onError={status !== 3 ? this._onError : undefined} // prevent infinite-loop bug
+                {...other}
+                style={[styles.image, style, requiredStyles, dynamicStyles]}
+                onLoad={this._onLoad}
+                onError={status !== 3 ? this._onError : undefined} // prevent infinite-loop bug
             />
         );
     }
 
-    get spinner () {
-        const { status } = this.state;
-        const { showSpinner, spinnerColor } = this.props;
+    get spinner() {
+        const {status} = this.state;
+        const {showSpinner, spinnerColor} = this.props;
 
         return status === 1 && showSpinner ? (
             <View style={styles.loaderContainer}>
                 <ActivityIndicator
-                  size={'small'}
-                  color={spinnerColor}
-                  animating={true}
+                    size={'small'}
+                    color={spinnerColor}
+                    animating={true}
                 />
             </View>
         ) : false;
     }
 
-    render () {
-        const { containerStyle } = this.props;
+    render() {
+        const {containerStyle} = this.props;
 
         return (
             <View
-              ref={(c) => { this._container = c; }}
-              pointerEvents={'none'}
-              style={[containerStyle, styles.container]}
-              onLayout={this._measureLayout}
+                ref={(c) => {
+                    this._container = c;
+                }}
+                pointerEvents={'none'}
+                style={[containerStyle, styles.container]}
+                onLayout={this._measureLayout}
             >
-                { this.image }
-                { this.spinner }
+                {this.image}
+                {this.spinner}
             </View>
         );
     }
